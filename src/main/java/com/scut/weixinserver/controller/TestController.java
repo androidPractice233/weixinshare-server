@@ -3,6 +3,7 @@ package com.scut.weixinserver.controller;
 import java.io.FileNotFoundException;
 import java.util.List;
 
+import com.scut.weixinserver.model.Result;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -11,7 +12,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.scut.weixinserver.model.APIBodyData;
 import com.scut.weixinserver.model.PageData;
-import com.scut.weixinserver.model.ResultBean;
 
 /** 
 * @author hts
@@ -22,19 +22,19 @@ import com.scut.weixinserver.model.ResultBean;
 public class TestController extends BaseController {
     @RequestMapping("/test") 
     @ResponseBody
-    public ResultBean test(APIBodyData data) throws FileNotFoundException, Exception{  
+    public Result test(APIBodyData data) throws FileNotFoundException, Exception{
       logger.info("test测试："+data.toString());
-      ResultBean result=new ResultBean();
+      Result result=new Result();
       result.setData("cao ni ma");
       return result;
        
     }  
     @RequestMapping("/MultipartTest") 
     @ResponseBody
-    public ResultBean multipartTest(@RequestParam(value = "fileList", required = false) List<MultipartFile> files,String test ) throws FileNotFoundException, Exception{  
+    public Result multipartTest(@RequestParam(value = "fileList", required = false) List<MultipartFile> files,String test ) throws FileNotFoundException, Exception{
       logger.info("test测试："+test);
       logger.info("test测试："+test);
-      ResultBean result=new ResultBean();
+      Result result=new Result();
       result.setData("cao ni ma");
       return result;
        

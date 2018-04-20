@@ -17,7 +17,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import com.google.gson.Gson;
 import com.scut.weixinserver.model.APIBodyData;
 import com.scut.weixinserver.model.PageData;
-import com.scut.weixinserver.model.ResultBean;
+import com.scut.weixinserver.model.Result;
 import com.scut.weixinserver.utils.AES;
 import com.scut.weixinserver.utils.RSA;
 

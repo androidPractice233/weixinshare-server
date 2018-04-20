@@ -6,6 +6,7 @@ import java.security.interfaces.RSAPrivateKey;
 
 import javax.servlet.http.HttpSession;
 
+import com.scut.weixinserver.model.Result;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.ClassUtils;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,7 +16,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.google.gson.Gson;
 import com.scut.weixinserver.model.APIBodyData;
 import com.scut.weixinserver.model.PageData;
-import com.scut.weixinserver.model.ResultBean;
 import com.scut.weixinserver.utils.RSA;
 
 /**
@@ -29,7 +29,7 @@ import com.scut.weixinserver.utils.RSA;
 public class KeyExchangeController extends BaseController {
 	@RequestMapping("/key/keyExchange")
 	@ResponseBody
-	public ResultBean keyExchange(@RequestBody String data, HttpSession session)
+	public Result keyExchange(@RequestBody String data, HttpSession session)
 			throws FileNotFoundException, Exception {
 		data = new Gson().fromJson(data, String.class);
 		logger.info("加密后的AESkey:" + data);
@@ -43,7 +43,7 @@ public class KeyExchangeController extends BaseController {
 		// logger.info("AESkey:"+AESkey);
 		// System.out.println(AESkey);
 		session.setAttribute("AESkey", AESkey);
-		return new ResultBean();
+		return new Result();
 	}
 
 }
