@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.Gson;
 import com.scut.weixinserver.model.APIBodyData;
-import com.scut.weixinserver.model.PageData;
+
 import com.scut.weixinserver.utils.RSA;
 
 /**

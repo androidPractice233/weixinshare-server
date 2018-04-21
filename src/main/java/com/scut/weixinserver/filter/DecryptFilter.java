@@ -92,7 +92,8 @@ public class DecryptFilter implements Filter {
 			encryptBean.setEncyptData(responseBodyMw);
 			String finalMessage = new Gson().toJson(encryptBean);
 			logger.info("加密返回数据： " + finalMessage);
-
+			//将假response的status复制到真response
+			response.setStatus(wrapResponse.getStatus());
 			writeResponse(response, finalMessage);
 			logger.info("——————————————————加密filter结束————————————————");
 		} else {

@@ -6,6 +6,9 @@ import com.scut.weixinserver.repo.TokenRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -24,18 +27,22 @@ public class JwtTokenInterceptor implements HandlerInterceptor {
 
     @Autowired
     TokenRepository tokenRepository;
-
+    
+    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
     //请求之前
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object o) throws Exception {
         //排除生成token的请求，且如果是options请求是core跨域预请求，设置allow对应头信息
 
-        if("/user/register".contentEquals(request.getRequestURL())
-                ||"/user/login".contentEquals(request.getRequestURL())
+    	String path = request.getRequestURI().substring(request.getContextPath().length()).replaceAll("[/]+$", "");
+        if("/user/register".contentEquals(path)
+                ||"/user/login".contentEquals(path)
+                ||"/key/keyExchange".contentEquals(path)
                 || RequestMethod.OPTIONS.toString().equals(request.getMethod())) {
             return true;
         }
 
+        
         final String authHeader = request.getHeader("Auth-Token");
         try {
             if (authHeader == null || authHeader.trim().equals("")) {
@@ -56,9 +63,10 @@ public class JwtTokenInterceptor implements HandlerInterceptor {
                 throw new SignatureException("not found token info, please get token again");
             }
         }catch (SignatureException | ExpiredJwtException e) {
-            PrintWriter writer = response.getWriter();
+        	logger.info(e.getMessage());
+        	PrintWriter writer = response.getWriter();
             //返回token错误
-            response.setStatus(401);
+//            response.setStatus(401);
             writer.write("{\"code\":\"401\",\n\"msg\":\"need refresh token\"}");
             writer.close();
             return false;

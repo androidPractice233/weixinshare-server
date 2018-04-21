@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.scut.weixinserver.model.APIBodyData;
-import com.scut.weixinserver.model.PageData;
+
 
 /** 
 * @author hts
