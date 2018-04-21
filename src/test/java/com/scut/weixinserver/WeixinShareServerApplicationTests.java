@@ -1,4 +1,4 @@
-package com.scut.winxinserver;
+package com.scut.weixinserver;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
