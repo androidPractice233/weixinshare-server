@@ -7,6 +7,9 @@ import java.security.interfaces.RSAPrivateKey;
 import javax.servlet.http.HttpSession;
 
 import com.scut.weixinserver.model.Result;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.ClassUtils;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,17 +30,16 @@ import com.scut.weixinserver.utils.RSA;
  */
 @Controller
 public class KeyExchangeController extends BaseController {
+	@Value(value = "classpath:RSA/pkcs8_rsa_private_key.pem")
+	private Resource RSAprivateKey;
 	@RequestMapping("/key/keyExchange")
 	@ResponseBody
 	public Result keyExchange(@RequestBody String data, HttpSession session)
 			throws FileNotFoundException, Exception {
 		data = new Gson().fromJson(data, String.class);
 		logger.info("加密后的AESkey:" + data);
-		String path = ClassUtils.getDefaultClassLoader().getResource("").getPath();
-		String osAppropriatePath = System.getProperty("os.name").contains("indow") ? path.substring(1) : path;
-		osAppropriatePath += "RSA";
 		RSAPrivateKey privateKey = RSA
-				.loadPrivateKey(new FileInputStream(osAppropriatePath += "/pkcs8_rsa_private_key.pem"));
+				.loadPrivateKey(RSAprivateKey.getInputStream());
 		String AESkey = RSA.decryptByPrivateKey(data, privateKey);
 		logger.info("AESkey:" + AESkey);
 		// logger.info("AESkey:"+AESkey);
