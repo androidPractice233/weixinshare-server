@@ -12,6 +12,8 @@ import com.scut.weixinserver.utils.MD5;
 import com.scut.weixinserver.utils.Uuid;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -44,7 +46,10 @@ public class UserService {
     @Autowired
     private TokenRepository tokenRepository;
 
+    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
+
     public ResponseEntity login(User user) {
+        logger.info("UserService.login: args={}", user.toString());
         Result<String> result = new Result<>();
 
         if(user.getUserId() == null || "".equals(user.getUserId())) {
@@ -57,9 +62,11 @@ public class UserService {
             User userFromDb = userRepository.findUserByUserId(user.getUserId());
             user.setUserPwd(MD5.MD5Encode(user.getUserPwd(), "UTF-8"));
             if(userFromDb == null) {
+                logger.info("UserService.login: userNotFound={}", user.toString());
                 result.setCodeAndMsg(ResultCode.USER_NOT_EXIST);
                 return new ResponseEntity<>(result, HttpStatus.NOT_ACCEPTABLE);
             } else if(!userFromDb.getUserPwd().equals(user.getUserPwd())) {
+                logger.info("UserService.login: userPassErr={}", user.toString());
                 result.setCodeAndMsg(ResultCode.USER_PASS_ERR);
                 return new ResponseEntity<>(result, HttpStatus.NOT_ACCEPTABLE);
             } else {
@@ -76,6 +83,7 @@ public class UserService {
                     tokenFromDb.setUserId(user.getUserId());
                     tokenFromDb.setBuildTime(String.valueOf(System.currentTimeMillis()));
                     tokenFromDb.setToken(tokenStr);
+                    logger.info("UserService.login: gen new Token, user={}, token={}", user.toString(), tokenStr);
                     tokenRepository.save(tokenFromDb);
                 } else {
                     long builtTime = Long.valueOf(tokenFromDb.getBuildTime());
@@ -84,10 +92,12 @@ public class UserService {
                     //10天的有效期
                     if(second > 0 && second < 864000) {
                         tokenStr = tokenFromDb.getToken();
+                        logger.info("UserService.login: tokenInTime={}", tokenStr);
                     } else {
                         tokenStr = createNewToken(user.getUserId());
                         tokenFromDb.setBuildTime(String.valueOf(System.currentTimeMillis()));
                         tokenFromDb.setToken(tokenStr);
+                        logger.info("UserService.login: tokenOutOfTime, genNewToken={}", tokenStr);
                         tokenRepository.save(tokenFromDb);
                     }
                 }
@@ -99,6 +109,7 @@ public class UserService {
     }
 
     public ResponseEntity register(User user) {
+        logger.info("UserService.register: user={}", user.toString());
         Result<Map> result = new Result<>();
         if("".equals(user.getUserName())) {
             result.setCodeAndMsg(ResultCode.USER_NAME_ERR);
@@ -112,7 +123,9 @@ public class UserService {
             user.setUserPwd(MD5.MD5Encode(user.getUserPwd(), "UTF-8"));
             user = userRepository.save(user);
             if(user.getUserId() == null || user.getUserId().equals("")) {
-                throw new RuntimeException("UserServices: insert user wrong");
+                logger.error("UserService.register: insert error={}", user.toString());
+                result.setCodeAndMsg(ResultCode.SERVER_ERROR);
+                return new ResponseEntity<>(result, HttpStatus.INTERNAL_SERVER_ERROR);
             }
             Map temp = new HashMap();
             temp.put("userId", user.getUserId());
@@ -124,9 +137,11 @@ public class UserService {
 
 
     public ResponseEntity setPortrait(String userId, String portraitUrl) {
+        logger.info("UserService.setPortrait: userId={}, portrait={}", userId, portraitUrl);
         Result<Map> result = new Result<>();
         User userFromDb = userRepository.findUserByUserId(userId);
         if(userFromDb == null) {
+            logger.info("UserService.setPortrait: userNotFound={}", userId);
             result.setCodeAndMsg(ResultCode.USER_ID_EXIST);
             return new ResponseEntity<>(result, HttpStatus.NOT_ACCEPTABLE);
         }else {
@@ -142,18 +157,22 @@ public class UserService {
 
 
     public ResponseEntity update(User user) {
+        logger.info("UserService.update: user={}", user.toString());
         Result<String> result = new Result<>();
 
         if(user.getUserId() == null || "".equals(user.getUserId())) {
+            logger.info("UserService.update: invalidParams={}", user.toString());
             result.setCodeAndMsg(ResultCode.USER_NOT_EXIST);
             return new ResponseEntity<>(result, HttpStatus.NOT_ACCEPTABLE);
         } else if(user.getUserPwd() == null || "".equals(user.getUserPwd())) {
+            logger.info("UserService.update: userPassErr={}", user.toString());
             result.setCodeAndMsg(ResultCode.USER_PASS_ERR);
             return new ResponseEntity<>(result, HttpStatus.NOT_ACCEPTABLE);
         } else {
             User userFromDb = userRepository.findUserByUserId(user.getUserId());
             user.setUserPwd(MD5.MD5Encode(user.getUserPwd(), "UTF-8"));
             if(userFromDb == null) {
+                logger.info("UserService.update: userNotFound={}", user.toString());
                 result.setCodeAndMsg(ResultCode.USER_NOT_EXIST);
                 return new ResponseEntity<>(result, HttpStatus.NOT_ACCEPTABLE);
             } else {
@@ -168,9 +187,11 @@ public class UserService {
 
     @Transactional
     public ResponseEntity delete(User user) {
+        logger.info("UserService.delete: user={}", user.toString());
         Result<String> result = new Result<>();
 
         if(user.getUserId() == null || "".equals(user.getUserId())) {
+            logger.info("UserService.delete: invalidParams={}", user.toString());
             result.setCodeAndMsg(ResultCode.USER_NOT_EXIST);
             return new ResponseEntity<>(result, HttpStatus.NOT_ACCEPTABLE);
         } else {
@@ -184,6 +205,7 @@ public class UserService {
                 result.setCodeAndMsg(ResultCode.SUCCESS);
                 return new ResponseEntity<>(result, HttpStatus.OK);
             }else{
+                logger.info("UserService.delete: userNotFound={}", user.toString());
                 result.setCodeAndMsg(ResultCode.USER_ID_EXIST);
                 return new ResponseEntity<>(result, HttpStatus.NOT_ACCEPTABLE);
             }
@@ -205,13 +227,16 @@ public class UserService {
     }
 
     public ResponseEntity search(User user) {
+        logger.info("UserService.search: user={}", user.toString());
         Result<User> result = new Result<>();
         if(user.getUserId() == null || "".equals(user.getUserId())) {
+            logger.info("UserService.delete: invalidParams={}", user.toString());
             result.setCodeAndMsg(ResultCode.USER_ID_EXIST);
             return new ResponseEntity<>(result, HttpStatus.NOT_ACCEPTABLE);
         } else {
             User userFromDb = userRepository.findUserByUserId(user.getUserId());
             if(userFromDb == null) {
+                logger.info("UserService.search: userNotFound={}", user.toString());
                 result.setCodeAndMsg(ResultCode.USER_NOT_EXIST);
                 return new ResponseEntity<>(result, HttpStatus.NOT_ACCEPTABLE);
             } else {

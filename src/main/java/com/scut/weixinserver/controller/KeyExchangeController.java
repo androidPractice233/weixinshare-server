@@ -36,6 +36,7 @@ public class KeyExchangeController extends BaseController {
 	@ResponseBody
 	public Result keyExchange(@RequestBody String data, HttpSession session)
 			throws FileNotFoundException, Exception {
+		System.out.println("timeout" + session.getMaxInactiveInterval());
 		data = new Gson().fromJson(data, String.class);
 		logger.info("加密后的AESkey:" + data);
 		RSAPrivateKey privateKey = RSA

@@ -3,6 +3,8 @@ package com.scut.weixinserver.service;
 
 import com.scut.weixinserver.entity.Comment;
 import com.scut.weixinserver.entity.Moment;
+import com.scut.weixinserver.entity.User;
+import com.scut.weixinserver.model.CommentBean;
 import com.scut.weixinserver.model.Result;
 import com.scut.weixinserver.model.ResultCode;
 import com.scut.weixinserver.repo.CommentRepository;
@@ -10,8 +12,12 @@ import com.scut.weixinserver.repo.MomentRepository;
 import com.scut.weixinserver.repo.UserRepository;
 import com.scut.weixinserver.utils.MapUtil;
 import com.scut.weixinserver.utils.Uuid;
+import org.apache.logging.log4j.util.Strings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,8 +37,12 @@ public class MomentService {
     @Autowired
     private UserRepository userRepository;
 
+    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+
     public ResponseEntity getMomentsNearby(double latitude, double longitude,
                                            int pageNum, int pageSize) {
+        logger.info("MomentService.getMomentsNearby: args latitude={}, longitude={}, pageNum={}, pageSize={}", latitude, longitude, pageNum, pageSize);
         Result<List<Map>> result = new Result<>();
         //范围5km
         double minLongitude, maxLongitude, minLatitude, maxLatitude;
@@ -47,10 +57,9 @@ public class MomentService {
 
         PageRequest pageRequest = new PageRequest(pageNum, pageSize,
                 new Sort(Sort.Direction.DESC, "createTime"));
+
         List<Moment> moments = momentRepository.getMomentsByLatitudeBetweenAndLongitudeBetween(
                 minLatitude, maxLatitude, minLongitude, maxLongitude, pageRequest);
-
-
         List<Map> resultList = new ArrayList<>();
         for (Moment moment : moments) {
             Map<String, Object> tempMap = new HashMap<>();
@@ -62,6 +71,7 @@ public class MomentService {
                 resultList.add(tempMap);
             }
         }
+        logger.info("MomentService.getMomentsNearby: resultListSize={}", resultList.size());
         if(resultList.size() > 0) {
             result.setData(resultList);
             result.setCodeAndMsg(ResultCode.SUCCESS);
@@ -74,6 +84,7 @@ public class MomentService {
 
 
     public ResponseEntity getMomentsByMomentId(List ids) {
+        logger.info("MomentService.getMomentsByMomentId:args={}", ids.toString());
         Result<List<List<Object>>> result = new Result<>();
         if(ids.size() == 0) {
             result.setCodeAndMsg(ResultCode.MOMENT_NOT_UPDATE);
@@ -85,11 +96,23 @@ public class MomentService {
                 List<Object> temp = new ArrayList<>();
                 temp.add(moment);
                 List<Comment> comments = commentRepository.getCommentsByMomentId(moment.getMomentId());
-                if (comments.size() > 0) {
-                    temp.addAll(comments);
+                List<CommentBean> commentBeans = new ArrayList<>();
+                for(Comment comment : comments) {
+                    User sender = userRepository.findUserByUserId(comment.getSendId());
+                    User recver = userRepository.findUserByUserId(comment.getRecvId());
+                    if(sender == null || recver == null) {
+                        logger.info("MomentService.getMomentsByMomentId:sender or recver not found.commentId:{}, sendId:{}, recvId:{}", comment.getCommentId(),
+                                comment.getSendId(), comment.getRecvId());
+                    } else {
+                        commentBeans.add(new CommentBean(comment, sender.getNickName(), sender.getPortrait(), recver.getNickName()));
+                    }
+                }
+                if (commentBeans.size() > 0) {
+                    temp.addAll(commentBeans);
                 }
                 resultMoments.add(temp);
             }
+            logger.info("MomentService.getMomentsByMomentId: return size = {}", resultMoments.size());
             if(resultMoments.size() > 0) {
                 result.setData(resultMoments);
                 result.setCodeAndMsg(ResultCode.SUCCESS);
@@ -102,23 +125,35 @@ public class MomentService {
     }
 
     public ResponseEntity getMomentsByUserId(String userId, int pageNum, int pageSize) {
+        logger.info("MomentService.getMomentsByUserId: userId = {}, pageNum = {}, pageSize = {}", userId, pageNum, pageSize);
         Result<List<List<Object>>> result = new Result<>();
 
         PageRequest pageRequest = new PageRequest(pageNum, pageSize,
                 new Sort(Sort.Direction.DESC, "createTime"));
         List<Moment> moments = momentRepository.getMomentsByUserId(userId, pageRequest);
-
         List<List<Object>> resultMoments = new ArrayList<>();
         for (Moment moment : moments) {
             //查询结果，每个子list第一条为moment， 后面为comment
             List<Object> temp = new ArrayList<>();
             temp.add(moment);
             List<Comment> comments = commentRepository.getCommentsByMomentId(moment.getMomentId());
-            if (comments.size() > 0) {
-                temp.addAll(comments);
+            List<CommentBean> commentBeans = new ArrayList<>();
+            for(Comment comment : comments) {
+                User sender = userRepository.findUserByUserId(comment.getSendId());
+                User recver = userRepository.findUserByUserId(comment.getRecvId());
+                if(sender == null || recver == null) {
+                    logger.info("MomentService.getMomentsByUserId:sender or recver not found.commentId:{}, sendId:{}, recvId:{}", comment.getCommentId(),
+                            comment.getSendId(), comment.getRecvId());
+                } else {
+                    commentBeans.add(new CommentBean(comment, sender.getNickName(), sender.getPortrait(), recver.getNickName()));
+                }
+            }
+            if (commentBeans.size() > 0) {
+                temp.addAll(commentBeans);
             }
             resultMoments.add(temp);
         }
+        logger.info("MomentService.getMomentsByUserId: return size = {}", resultMoments.size());
         if(resultMoments.size() > 0) {
             result.setData(resultMoments);
             result.setCodeAndMsg(ResultCode.SUCCESS);
@@ -130,13 +165,16 @@ public class MomentService {
     }
 
     public ResponseEntity createMoment(Moment moment) {
+        logger.info("MomentService.createMoment: args={}", moment.toString());
         Result<Map> result = new Result<>();
         moment.setMomentId(Uuid.getUuid());
         moment.setCreateTime(new Date());
         moment.setUpdateTime(new Date());
         moment = momentRepository.save(moment);
         if(moment.getMomentId() == null || moment.getMomentId().equals("")){
-            throw new RuntimeException("UserServices: insert user wrong");
+            logger.error("MomentService.createMoment: insert error={}", moment.toString());
+            result.setCodeAndMsg(ResultCode.SERVER_ERROR);
+            return new ResponseEntity<>(result, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         Map<String, Object> tempMap = new HashMap<>();
         tempMap.put("momentId", moment.getMomentId());
@@ -146,13 +184,15 @@ public class MomentService {
     }
 
     public ResponseEntity uploadPicContent(String momentId, List<String> fileUrls) {
+        logger.info("MomentService.uploadPicContent: momentId={}", momentId);
         Result<Map> result = new Result<>();
         Moment momentFromDb = momentRepository.getMomentByMomentId(momentId);
         if(momentFromDb == null) {
+            logger.info("MomentService.uploadPicContent: momentNotFound momentId={}", momentId);
             result.setCodeAndMsg(ResultCode.MOMENT_NOT_EXIST);
             return new ResponseEntity<>(result, HttpStatus.NOT_ACCEPTABLE);
         }else {
-            String url = String.join(",", fileUrls);
+            String url = Strings.join(fileUrls, ',');
             momentFromDb.setPicContent(url);
             momentRepository.save(momentFromDb);
             Map<String, String> temp = new HashMap<>();
@@ -165,9 +205,11 @@ public class MomentService {
 
     @Transactional
     public ResponseEntity deleteMoment(Moment moment) {
+        logger.info("MomentService.deleteMoment: args={}", moment.toString());
         Result<String> result = new Result<>();
         int n = momentRepository.deleteMomentByMomentId(moment.getMomentId());
         if(n == 0) {
+            logger.info("MomentService.deleteMoment: momentNotFound moment={}", moment.toString());
             result.setCodeAndMsg(ResultCode.MOMENT_NOT_EXIST);
         } else {
             commentRepository.deleteCommentsByMomentId(moment.getMomentId());
@@ -177,12 +219,15 @@ public class MomentService {
     }
 
     public ResponseEntity createComment(Comment comment) {
+        logger.info("MomentService.createComment: comment={}", comment.toString());
         Result<Map> result = new Result<>();
         comment.setCommentId(Uuid.getUuid());
         comment.setCreateTime(new Date());
         comment = commentRepository.save(comment);
         if(comment.getMomentId() == null || comment.getMomentId().equals("")){
-            throw new RuntimeException("UserServices: insert moment wrong");
+            logger.error("MomentService.createComment: insert error={}", comment.toString());
+            result.setCodeAndMsg(ResultCode.SERVER_ERROR);
+            return new ResponseEntity<>(result, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         Moment moment = momentRepository.getMomentByMomentId(comment.getMomentId());
         moment.setUpdateTime(comment.getCreateTime());
@@ -196,6 +241,7 @@ public class MomentService {
 
     @Transactional
     public ResponseEntity deleteComment(Comment comment) {
+        logger.info("MomentService.deleteComment: comment={}", comment.toString());
         Result<String> result = new Result<>();
         if(comment.getCommentId() == null || comment.getCommentId().equals("")){
             result.setCodeAndMsg(ResultCode.COMMENT_NOT_EXIST);
@@ -204,6 +250,7 @@ public class MomentService {
         comment = commentRepository.getCommentByCommentId(comment.getCommentId());
         int n = commentRepository.deleteCommentByCommentId(comment.getCommentId());
         if(n == 0) {
+            logger.info("MomentService.deleteComment: comentNotFound comentId={}", comment.toString());
             result.setCodeAndMsg(ResultCode.COMMENT_NOT_EXIST);
             return new ResponseEntity<>(result, HttpStatus.NOT_ACCEPTABLE);
         } else {
@@ -218,6 +265,7 @@ public class MomentService {
 
     public ResponseEntity updateComment(String userId, long sinceTime,
                                         int pageNum, int pageSize) {
+        logger.info("MomentService.updateComment: userId={}, sinceTime={}, pageNum={}, pageSize={}", userId, sinceTime, pageNum, pageSize);
         Result<List<Comment>> result = new Result<>();
         List<Comment> resultComments = new ArrayList<>();
         PageRequest pageRequest = new PageRequest(pageNum, pageSize,
@@ -226,7 +274,6 @@ public class MomentService {
         for (Moment moment : moments) {
             List<Comment> comments = commentRepository.getCommentByMomentIdAndCreateTimeAfter(
                     moment.getMomentId(), new Date(sinceTime));
-
             if (comments.size() > 0) {
                 resultComments.addAll(comments);
             }

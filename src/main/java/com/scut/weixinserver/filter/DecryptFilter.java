@@ -68,7 +68,7 @@ public class DecryptFilter implements Filter {
 			return;
 		}
 		//如果是multipart/form-data类型，不进行加密解密
-		if(request.getContentType().contains("multipart/form-data")){
+		if(request.getContentType() != null && request.getContentType().contains("multipart/form-data")){
 			logger.info("multipart/form-data类型，不需要加解密！！");
 			logger.info("——————————————————解密filter结束————————————————");
 			filterChain.doFilter(request, response);

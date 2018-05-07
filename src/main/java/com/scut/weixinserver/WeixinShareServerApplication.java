@@ -11,4 +11,6 @@ public class WeixinShareServerApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(WeixinShareServerApplication.class, args);
 	}
+
+
 }

@@ -53,7 +53,7 @@ public class BodyReaderRequestWrapper extends HttpServletRequestWrapper {
     	 String AESkey=(String) request.getSession().getAttribute("AESkey");
          if(AESkey==null)
         	 return false;
-         else{ 
+         else{
         	 logger.info("解密前:"+body);
         	 body=AES.decrypt(body, AESkey);
         	 logger.info("解密后：",body);
