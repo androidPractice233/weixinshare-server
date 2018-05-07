@@ -18,7 +18,9 @@ public enum ResultCode {
     COMMENT_NOT_EXIST(509, "评论不存在"),
 
     //上传图片
-    IMG_NOT_ALLOW(510, "图片错误");
+    IMG_NOT_ALLOW(510, "图片错误"),
+
+    INVALID_PARAMS(511, "参数错误");
 
 
 

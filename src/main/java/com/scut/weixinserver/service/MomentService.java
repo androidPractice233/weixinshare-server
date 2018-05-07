@@ -5,6 +5,7 @@ import com.scut.weixinserver.entity.Comment;
 import com.scut.weixinserver.entity.Moment;
 import com.scut.weixinserver.entity.User;
 import com.scut.weixinserver.model.CommentBean;
+import com.scut.weixinserver.model.MomentBean;
 import com.scut.weixinserver.model.Result;
 import com.scut.weixinserver.model.ResultCode;
 import com.scut.weixinserver.repo.CommentRepository;
@@ -94,7 +95,8 @@ public class MomentService {
             List<List<Object>> resultMoments = new ArrayList<>();
             for (Moment moment : moments) {
                 List<Object> temp = new ArrayList<>();
-                temp.add(moment);
+                User user = userRepository.findUserByUserId(moment.getUserId());
+                temp.add(new MomentBean(moment, user.getNickName(), user.getPortrait()));
                 List<Comment> comments = commentRepository.getCommentsByMomentId(moment.getMomentId());
                 List<CommentBean> commentBeans = new ArrayList<>();
                 for(Comment comment : comments) {
@@ -135,7 +137,8 @@ public class MomentService {
         for (Moment moment : moments) {
             //查询结果，每个子list第一条为moment， 后面为comment
             List<Object> temp = new ArrayList<>();
-            temp.add(moment);
+            User user = userRepository.findUserByUserId(moment.getUserId());
+            temp.add(new MomentBean(moment, user.getNickName(), user.getPortrait()));
             List<Comment> comments = commentRepository.getCommentsByMomentId(moment.getMomentId());
             List<CommentBean> commentBeans = new ArrayList<>();
             for(Comment comment : comments) {

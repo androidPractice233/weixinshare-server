@@ -19,6 +19,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 @Controller
 @RequestMapping(path="/user")
@@ -64,11 +66,7 @@ public class UserController {
                 result.setCodeAndMsg(ResultCode.IMG_NOT_ALLOW);
                 return new ResponseEntity<>(result, HttpStatus.NOT_ACCEPTABLE);
             }
-
-
         }
-
-
     }
 
 
@@ -92,6 +90,13 @@ public class UserController {
     public @ResponseBody
     ResponseEntity search(@RequestBody User user) {
         return userService.search(user);
+    }
+
+    @PostMapping(path="/getnickpot")
+    public @ResponseBody
+    ResponseEntity getnickpot(@RequestBody String userIds) {
+        List<String> idList = Arrays.asList(userIds.split(","));
+        return userService.getNickPot(idList);
     }
 
 

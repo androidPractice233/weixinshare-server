@@ -1,5 +1,6 @@
 package com.scut.weixinserver.entity;
 
+import org.hibernate.validator.constraints.UniqueElements;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.Entity;
@@ -10,6 +11,7 @@ import java.util.Date;
 public class User {
     @Id
     private String userId;
+    @UniqueElements
     private String userName;
     private String nickName;
     private String userPwd;
