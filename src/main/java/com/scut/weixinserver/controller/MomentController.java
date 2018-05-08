@@ -52,12 +52,10 @@ public class MomentController {
     }
 
 
-    @PostMapping(path="/mine")
+    @PostMapping(path="/personal")
     public @ResponseBody
-    ResponseEntity getMomentByUserId(@RequestBody MomentReq momentReq,
-                                     HttpServletRequest request) {
-        String userId = request.getAttribute("userId").toString();
-        return momentService.getMomentsByUserId(userId, momentReq.getPageNum(), momentReq.getPageSize());
+    ResponseEntity getMomentByUserId(@RequestBody MomentReq momentReq) {
+        return momentService.getMomentsByUserId(momentReq.getUserId(), momentReq.getPageNum(), momentReq.getPageSize());
     }
 
     @PostMapping(path="/create")

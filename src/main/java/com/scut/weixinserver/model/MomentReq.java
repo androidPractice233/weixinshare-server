@@ -12,6 +12,11 @@ public class MomentReq {
 
     private String ids;
 
+    private String userId;
+
+    public MomentReq() {
+    }
+
     @Override
     public String toString() {
         return "MomentReq{" +
@@ -20,30 +25,18 @@ public class MomentReq {
                 ", pageNum=" + pageNum +
                 ", pageSize=" + pageSize +
                 ", ids='" + ids + '\'' +
+                ", userId='" + userId + '\'' +
                 '}';
     }
 
-    public MomentReq() {
-    }
-
-    public MomentReq(double latitude, double longitude, int pageNum, int pageSize, String ids) {
+    public MomentReq(double latitude, double longitude, int pageNum, int pageSize, String ids, String userId) {
         this.latitude = latitude;
         this.longitude = longitude;
         this.pageNum = pageNum;
         this.pageSize = pageSize;
         this.ids = ids;
+        this.userId = userId;
     }
-
-
-
-    public String getIds() {
-        return ids;
-    }
-
-    public void setIds(String ids) {
-        this.ids = ids;
-    }
-
 
     public double getLatitude() {
         return latitude;
@@ -75,5 +68,21 @@ public class MomentReq {
 
     public void setPageSize(int pageSize) {
         this.pageSize = pageSize;
+    }
+
+    public String getIds() {
+        return ids;
+    }
+
+    public void setIds(String ids) {
+        this.ids = ids;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 }
