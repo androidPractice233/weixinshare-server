@@ -171,18 +171,21 @@ public class UserService {
             logger.info("UserService.update: invalidParams={}", user.toString());
             result.setCodeAndMsg(ResultCode.USER_NOT_EXIST);
             return new ResponseEntity<>(result, HttpStatus.NOT_ACCEPTABLE);
-        } else if(user.getUserPwd() == null || "".equals(user.getUserPwd())) {
-            logger.info("UserService.update: userPassErr={}", user.toString());
-            result.setCodeAndMsg(ResultCode.USER_PASS_ERR);
-            return new ResponseEntity<>(result, HttpStatus.NOT_ACCEPTABLE);
-        } else {
+        }
+//        else if(user.getUserPwd() == null || "".equals(user.getUserPwd())) {
+//            logger.info("UserService.update: userPassErr={}", user.toString());
+//            result.setCodeAndMsg(ResultCode.USER_PASS_ERR);
+//            return new ResponseEntity<>(result, HttpStatus.NOT_ACCEPTABLE);
+//        }
+        else {
             User userFromDb = userRepository.findUserByUserId(user.getUserId());
-            user.setUserPwd(MD5.MD5Encode(user.getUserPwd(), "UTF-8"));
             if(userFromDb == null) {
                 logger.info("UserService.update: userNotFound={}", user.toString());
                 result.setCodeAndMsg(ResultCode.USER_NOT_EXIST);
                 return new ResponseEntity<>(result, HttpStatus.NOT_ACCEPTABLE);
             } else {
+//                user.setUserPwd(MD5.MD5Encode(user.getUserPwd(), "UTF-8"));
+                user.setUserPwd(userFromDb.getUserPwd());
                 user.setPortrait(userFromDb.getPortrait());
                 user.setLastLoginTime(userFromDb.getLastLoginTime());
                 userRepository.save(user);
