@@ -79,7 +79,7 @@ public class MomentService {
             return new ResponseEntity<>(result, HttpStatus.OK);
         }else {
             result.setCodeAndMsg(ResultCode.MOMENT_NOT_UPDATE);
-            return new ResponseEntity<>(result, HttpStatus.NOT_ACCEPTABLE);
+            return new ResponseEntity<>(result, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -89,7 +89,7 @@ public class MomentService {
         Result<List<List<Object>>> result = new Result<>();
         if(ids.size() == 0) {
             result.setCodeAndMsg(ResultCode.MOMENT_NOT_UPDATE);
-            return new ResponseEntity<>(result, HttpStatus.NOT_ACCEPTABLE);
+            return new ResponseEntity<>(result, HttpStatus.INTERNAL_SERVER_ERROR);
         }else {
             List<Moment> moments = momentRepository.findMomentsByMomentIdIn(ids);
             List<List<Object>> resultMoments = new ArrayList<>();
@@ -121,7 +121,7 @@ public class MomentService {
                 return new ResponseEntity<>(result, HttpStatus.OK);
             }else {
                 result.setCodeAndMsg(ResultCode.MOMENT_NOT_UPDATE);
-                return new ResponseEntity<>(result, HttpStatus.NOT_ACCEPTABLE);
+                return new ResponseEntity<>(result, HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
     }
@@ -163,7 +163,7 @@ public class MomentService {
             return new ResponseEntity<>(result, HttpStatus.OK);
         }else {
             result.setCodeAndMsg(ResultCode.MOMENT_NOT_UPDATE);
-            return new ResponseEntity<>(result, HttpStatus.NOT_ACCEPTABLE);
+            return new ResponseEntity<>(result, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -193,7 +193,7 @@ public class MomentService {
         if(momentFromDb == null) {
             logger.info("MomentService.uploadPicContent: momentNotFound momentId={}", momentId);
             result.setCodeAndMsg(ResultCode.MOMENT_NOT_EXIST);
-            return new ResponseEntity<>(result, HttpStatus.NOT_ACCEPTABLE);
+            return new ResponseEntity<>(result, HttpStatus.INTERNAL_SERVER_ERROR);
         }else {
             String url = Strings.join(fileUrls, ',');
             momentFromDb.setPicContent(url);
@@ -248,13 +248,13 @@ public class MomentService {
         Result<String> result = new Result<>();
         if(comment.getCommentId() == null || comment.getCommentId().equals("")){
             result.setCodeAndMsg(ResultCode.COMMENT_NOT_EXIST);
-            return new ResponseEntity<>(result, HttpStatus.NOT_ACCEPTABLE);
+            return new ResponseEntity<>(result, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         int n = commentRepository.deleteCommentByCommentId(comment.getCommentId());
         if(n == 0) {
             logger.info("MomentService.deleteComment: comentNotFound comentId={}", comment.toString());
             result.setCodeAndMsg(ResultCode.COMMENT_NOT_EXIST);
-            return new ResponseEntity<>(result, HttpStatus.NOT_ACCEPTABLE);
+            return new ResponseEntity<>(result, HttpStatus.INTERNAL_SERVER_ERROR);
         } else {
             result.setCodeAndMsg(ResultCode.SUCCESS);
         }
@@ -286,7 +286,7 @@ public class MomentService {
             return new ResponseEntity<>(result, HttpStatus.OK);
         }else {
             result.setCodeAndMsg(ResultCode.COMMENT_NOT_UPDATE);
-            return new ResponseEntity<>(result, HttpStatus.NOT_ACCEPTABLE);
+            return new ResponseEntity<>(result, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

@@ -51,21 +51,21 @@ public class UserService {
         Result<Map> result = new Result<>();
         if(user.getUserId() == null || "".equals(user.getUserId())) {
             result.setCodeAndMsg(ResultCode.INVALID_PARAMS);
-            return new ResponseEntity<>(result, HttpStatus.NOT_ACCEPTABLE);
+            return new ResponseEntity<>(result, HttpStatus.INTERNAL_SERVER_ERROR);
         } else if(user.getUserPwd() == null || "".equals(user.getUserPwd())) {
             result.setCodeAndMsg(ResultCode.USER_PASS_ERR);
-            return new ResponseEntity<>(result, HttpStatus.NOT_ACCEPTABLE);
+            return new ResponseEntity<>(result, HttpStatus.INTERNAL_SERVER_ERROR);
         } else {
             User userFromDb = userRepository.findUserByUserId(user.getUserId());
             user.setUserPwd(MD5.MD5Encode(user.getUserPwd(), "UTF-8"));
             if(userFromDb == null) {
                 logger.info("UserService.login: userNotFound={}", user.toString());
                 result.setCodeAndMsg(ResultCode.USER_NOT_EXIST);
-                return new ResponseEntity<>(result, HttpStatus.NOT_ACCEPTABLE);
+                return new ResponseEntity<>(result, HttpStatus.INTERNAL_SERVER_ERROR);
             } else if(!userFromDb.getUserPwd().equals(user.getUserPwd())) {
                 logger.info("UserService.login: userPassErr={}", user.toString());
                 result.setCodeAndMsg(ResultCode.USER_PASS_ERR);
-                return new ResponseEntity<>(result, HttpStatus.NOT_ACCEPTABLE);
+                return new ResponseEntity<>(result, HttpStatus.INTERNAL_SERVER_ERROR);
             } else {
                 //更新登录时间
                 userFromDb.setLastLoginTime(new Date());
@@ -114,16 +114,16 @@ public class UserService {
         Result<Map> result = new Result<>();
         if("".equals(user.getUserName())) {
             result.setCodeAndMsg(ResultCode.USER_NAME_ERR);
-            return new ResponseEntity<>(result, HttpStatus.NOT_ACCEPTABLE);
+            return new ResponseEntity<>(result, HttpStatus.INTERNAL_SERVER_ERROR);
         }else if("".equals(user.getUserPwd())){
             result.setCodeAndMsg(ResultCode.USER_PASS_ERR);
-            return new ResponseEntity<>(result, HttpStatus.NOT_ACCEPTABLE);
+            return new ResponseEntity<>(result, HttpStatus.INTERNAL_SERVER_ERROR);
         }else {
             User userFromDb = userRepository.findUserByUserName(user.getUserName());
             if(userFromDb != null) {
                 logger.info("UserService.register: userAlreadyExist={}", user.toString());
                 result.setCodeAndMsg(ResultCode.USER_ID_EXIST);
-                return new ResponseEntity<>(result, HttpStatus.NOT_ACCEPTABLE);
+                return new ResponseEntity<>(result, HttpStatus.INTERNAL_SERVER_ERROR);
             }
             user.setUserId(Uuid.getUuid());
             user.setLastLoginTime(new Date());
@@ -150,7 +150,7 @@ public class UserService {
         if(userFromDb == null) {
             logger.info("UserService.setPortrait: userNotFound={}", userId);
             result.setCodeAndMsg(ResultCode.USER_NOT_EXIST);
-            return new ResponseEntity<>(result, HttpStatus.NOT_ACCEPTABLE);
+            return new ResponseEntity<>(result, HttpStatus.INTERNAL_SERVER_ERROR);
         }else {
             userFromDb.setPortrait(portraitUrl);
             userRepository.save(userFromDb);
@@ -170,19 +170,19 @@ public class UserService {
         if(user.getUserId() == null || "".equals(user.getUserId())) {
             logger.info("UserService.update: invalidParams={}", user.toString());
             result.setCodeAndMsg(ResultCode.USER_NOT_EXIST);
-            return new ResponseEntity<>(result, HttpStatus.NOT_ACCEPTABLE);
+            return new ResponseEntity<>(result, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 //        else if(user.getUserPwd() == null || "".equals(user.getUserPwd())) {
 //            logger.info("UserService.update: userPassErr={}", user.toString());
 //            result.setCodeAndMsg(ResultCode.USER_PASS_ERR);
-//            return new ResponseEntity<>(result, HttpStatus.NOT_ACCEPTABLE);
+//            return new ResponseEntity<>(result, HttpStatus.INTERNAL_SERVER_ERROR);
 //        }
         else {
             User userFromDb = userRepository.findUserByUserId(user.getUserId());
             if(userFromDb == null) {
                 logger.info("UserService.update: userNotFound={}", user.toString());
                 result.setCodeAndMsg(ResultCode.USER_NOT_EXIST);
-                return new ResponseEntity<>(result, HttpStatus.NOT_ACCEPTABLE);
+                return new ResponseEntity<>(result, HttpStatus.INTERNAL_SERVER_ERROR);
             } else {
 //                user.setUserPwd(MD5.MD5Encode(user.getUserPwd(), "UTF-8"));
                 user.setUserPwd(userFromDb.getUserPwd());
@@ -203,7 +203,7 @@ public class UserService {
         if(user.getUserId() == null || "".equals(user.getUserId())) {
             logger.info("UserService.delete: invalidParams={}", user.toString());
             result.setCodeAndMsg(ResultCode.USER_NOT_EXIST);
-            return new ResponseEntity<>(result, HttpStatus.NOT_ACCEPTABLE);
+            return new ResponseEntity<>(result, HttpStatus.INTERNAL_SERVER_ERROR);
         } else {
             int n ;
             n = userRepository.deleteUserByUserId(user.getUserId());
@@ -217,7 +217,7 @@ public class UserService {
             }else{
                 logger.info("UserService.delete: userNotFound={}", user.toString());
                 result.setCodeAndMsg(ResultCode.USER_NOT_EXIST);
-                return new ResponseEntity<>(result, HttpStatus.NOT_ACCEPTABLE);
+                return new ResponseEntity<>(result, HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
     }
@@ -242,13 +242,13 @@ public class UserService {
         if(user.getUserId() == null || "".equals(user.getUserId())) {
             logger.info("UserService.delete: invalidParams={}", user.toString());
             result.setCodeAndMsg(ResultCode.INVALID_PARAMS);
-            return new ResponseEntity<>(result, HttpStatus.NOT_ACCEPTABLE);
+            return new ResponseEntity<>(result, HttpStatus.INTERNAL_SERVER_ERROR);
         } else {
             User userFromDb = userRepository.findUserByUserId(user.getUserId());
             if(userFromDb == null) {
                 logger.info("UserService.search: userNotFound={}", user.toString());
                 result.setCodeAndMsg(ResultCode.USER_NOT_EXIST);
-                return new ResponseEntity<>(result, HttpStatus.NOT_ACCEPTABLE);
+                return new ResponseEntity<>(result, HttpStatus.INTERNAL_SERVER_ERROR);
             } else {
                 userFromDb.setUserPwd(null);
                 result.setData(userFromDb);
@@ -264,13 +264,13 @@ public class UserService {
         if(userIds.isEmpty()) {
             logger.info("UserService.getNickPot: invalidParams={}", userIds.toString());
             result.setCodeAndMsg(ResultCode.INVALID_PARAMS);
-            return new ResponseEntity<>(result, HttpStatus.NOT_ACCEPTABLE);
+            return new ResponseEntity<>(result, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         List<User> userList = userRepository.findUsersByUserIdIn(userIds);
         if(userList == null || userList.isEmpty()) {
             logger.info("UserService.getNickPot: userNotFound={}", userIds.toString());
             result.setCodeAndMsg(ResultCode.USER_NOT_EXIST);
-            return new ResponseEntity<>(result, HttpStatus.NOT_ACCEPTABLE);
+            return new ResponseEntity<>(result, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         List<Map> resultList = new ArrayList<>();
         for(User user :userList) {

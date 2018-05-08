@@ -53,7 +53,7 @@ public class UserController {
         if(portrait.isEmpty() || "".equals(portrait.getOriginalFilename())) {
             Result<String> result = new Result<>();
             result.setCodeAndMsg(ResultCode.IMG_NOT_ALLOW);
-            return new ResponseEntity<>(result, HttpStatus.NOT_ACCEPTABLE);
+            return new ResponseEntity<>(result, HttpStatus.INTERNAL_SERVER_ERROR);
         }else {
             String userId = request.getAttribute("userId").toString();
             String portraitUrl;
@@ -64,7 +64,7 @@ public class UserController {
                 e.printStackTrace();
                 Result<String> result = new Result<>();
                 result.setCodeAndMsg(ResultCode.IMG_NOT_ALLOW);
-                return new ResponseEntity<>(result, HttpStatus.NOT_ACCEPTABLE);
+                return new ResponseEntity<>(result, HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
     }
