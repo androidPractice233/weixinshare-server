@@ -38,7 +38,7 @@ public class MomentService {
     @Autowired
     private UserRepository userRepository;
 
-    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 
     public ResponseEntity getMomentsNearby(double latitude, double longitude,
@@ -59,7 +59,7 @@ public class MomentService {
         PageRequest pageRequest = new PageRequest(pageNum, pageSize,
                 new Sort(Sort.Direction.DESC, "createTime"));
 
-        List<Moment> moments = momentRepository.getMomentsByLatitudeBetweenAndLongitudeBetween(
+        List<Moment> moments = momentRepository.findMomentsByLatitudeBetweenAndLongitudeBetweenOrderByCreateTimeDesc(
                 minLatitude, maxLatitude, minLongitude, maxLongitude, pageRequest);
         List<Map> resultList = new ArrayList<>();
         for (Moment moment : moments) {
@@ -91,13 +91,13 @@ public class MomentService {
             result.setCodeAndMsg(ResultCode.MOMENT_NOT_UPDATE);
             return new ResponseEntity<>(result, HttpStatus.NOT_ACCEPTABLE);
         }else {
-            List<Moment> moments = momentRepository.getMomentsByMomentIdIn(ids);
+            List<Moment> moments = momentRepository.findMomentsByMomentIdIn(ids);
             List<List<Object>> resultMoments = new ArrayList<>();
             for (Moment moment : moments) {
                 List<Object> temp = new ArrayList<>();
                 User user = userRepository.findUserByUserId(moment.getUserId());
                 temp.add(new MomentBean(moment, user.getNickName(), user.getPortrait()));
-                List<Comment> comments = commentRepository.getCommentsByMomentId(moment.getMomentId());
+                List<Comment> comments = commentRepository.findCommentsByMomentId(moment.getMomentId());
                 List<CommentBean> commentBeans = new ArrayList<>();
                 for(Comment comment : comments) {
                     User sender = userRepository.findUserByUserId(comment.getSendId());
@@ -132,14 +132,14 @@ public class MomentService {
 
         PageRequest pageRequest = new PageRequest(pageNum, pageSize,
                 new Sort(Sort.Direction.DESC, "createTime"));
-        List<Moment> moments = momentRepository.getMomentsByUserId(userId, pageRequest);
+        List<Moment> moments = momentRepository.findMomentsByUserIdOrderByCreateTimeDesc(userId, pageRequest);
         List<List<Object>> resultMoments = new ArrayList<>();
         for (Moment moment : moments) {
             //查询结果，每个子list第一条为moment， 后面为comment
             List<Object> temp = new ArrayList<>();
             User user = userRepository.findUserByUserId(moment.getUserId());
             temp.add(new MomentBean(moment, user.getNickName(), user.getPortrait()));
-            List<Comment> comments = commentRepository.getCommentsByMomentId(moment.getMomentId());
+            List<Comment> comments = commentRepository.findCommentsByMomentId(moment.getMomentId());
             List<CommentBean> commentBeans = new ArrayList<>();
             for(Comment comment : comments) {
                 User sender = userRepository.findUserByUserId(comment.getSendId());
@@ -189,7 +189,7 @@ public class MomentService {
     public ResponseEntity uploadPicContent(String momentId, List<String> fileUrls) {
         logger.info("MomentService.uploadPicContent: momentId={}", momentId);
         Result<Map> result = new Result<>();
-        Moment momentFromDb = momentRepository.getMomentByMomentId(momentId);
+        Moment momentFromDb = momentRepository.findMomentByMomentId(momentId);
         if(momentFromDb == null) {
             logger.info("MomentService.uploadPicContent: momentNotFound momentId={}", momentId);
             result.setCodeAndMsg(ResultCode.MOMENT_NOT_EXIST);
@@ -232,7 +232,7 @@ public class MomentService {
             result.setCodeAndMsg(ResultCode.SERVER_ERROR);
             return new ResponseEntity<>(result, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        Moment moment = momentRepository.getMomentByMomentId(comment.getMomentId());
+        Moment moment = momentRepository.findMomentByMomentId(comment.getMomentId());
         moment.setUpdateTime(comment.getCreateTime());
         momentRepository.save(moment);
         Map<String, Object> tempMap = new HashMap<>();
@@ -250,7 +250,6 @@ public class MomentService {
             result.setCodeAndMsg(ResultCode.COMMENT_NOT_EXIST);
             return new ResponseEntity<>(result, HttpStatus.NOT_ACCEPTABLE);
         }
-        comment = commentRepository.getCommentByCommentId(comment.getCommentId());
         int n = commentRepository.deleteCommentByCommentId(comment.getCommentId());
         if(n == 0) {
             logger.info("MomentService.deleteComment: comentNotFound comentId={}", comment.toString());
@@ -259,7 +258,7 @@ public class MomentService {
         } else {
             result.setCodeAndMsg(ResultCode.SUCCESS);
         }
-        Moment moment = momentRepository.getMomentByMomentId(comment.getMomentId());
+        Moment moment = momentRepository.findMomentByMomentId(comment.getMomentId());
         moment.setUpdateTime(new Date());
         momentRepository.save(moment);
         result.setCodeAndMsg(ResultCode.SUCCESS);
@@ -273,9 +272,9 @@ public class MomentService {
         List<Comment> resultComments = new ArrayList<>();
         PageRequest pageRequest = new PageRequest(pageNum, pageSize,
                 new Sort(Sort.Direction.DESC, "createTime"));
-        List<Moment> moments = momentRepository.getMomentsByUserId(userId, pageRequest);
+        List<Moment> moments = momentRepository.findMomentsByUserIdOrderByCreateTimeDesc(userId, pageRequest);
         for (Moment moment : moments) {
-            List<Comment> comments = commentRepository.getCommentByMomentIdAndCreateTimeAfter(
+            List<Comment> comments = commentRepository.findCommentsByMomentIdAndCreateTimeAfterOrderByCreateTimeAsc(
                     moment.getMomentId(), new Date(sinceTime));
             if (comments.size() > 0) {
                 resultComments.addAll(comments);

@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
-    Comment getCommentByCommentId(String commentId);
+    Comment findCommentByCommentId(String commentId);
 
     int deleteCommentsBySendId(String senderId);
 
@@ -16,7 +16,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     int deleteCommentsByMomentId(String momentId);
 
-    List<Comment> getCommentsByMomentId(String momentId);
+    List<Comment> findCommentsByMomentId(String momentId);
 
-    List<Comment> getCommentByMomentIdAndCreateTimeAfter(String momentId, Date createTime);
+    List<Comment> findCommentsByMomentIdAndCreateTimeAfterOrderByCreateTimeAsc(String momentId, Date createTime);
 }

@@ -44,7 +44,7 @@ public class UserService {
     @Autowired
     private TokenRepository tokenRepository;
 
-    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public ResponseEntity login(User user) {
         logger.info("UserService.login: args={}", user.toString());
@@ -134,7 +134,7 @@ public class UserService {
                 result.setCodeAndMsg(ResultCode.SERVER_ERROR);
                 return new ResponseEntity<>(result, HttpStatus.INTERNAL_SERVER_ERROR);
             }
-            Map temp = new HashMap();
+            Map<String, String> temp = new HashMap();
             temp.put("userId", user.getUserId());
             result.setCodeAndMsg(ResultCode.SUCCESS);
             result.setData(temp);
@@ -263,7 +263,7 @@ public class UserService {
             result.setCodeAndMsg(ResultCode.INVALID_PARAMS);
             return new ResponseEntity<>(result, HttpStatus.NOT_ACCEPTABLE);
         }
-        List<User> userList = userRepository.getUsersByUserIdIn(userIds);
+        List<User> userList = userRepository.findUsersByUserIdIn(userIds);
         if(userList == null || userList.isEmpty()) {
             logger.info("UserService.getNickPot: userNotFound={}", userIds.toString());
             result.setCodeAndMsg(ResultCode.USER_NOT_EXIST);

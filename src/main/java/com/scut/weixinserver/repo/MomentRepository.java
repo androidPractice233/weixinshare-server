@@ -9,18 +9,18 @@ import java.util.List;
 public interface MomentRepository extends JpaRepository<Moment, Long> {
     int deleteMomentsByUserId(String userId);
 
-    List<Moment> getMomentsByUserId(String userId, Pageable pageRequest);
+    List<Moment> findMomentsByUserIdOrderByCreateTimeDesc(String userId, Pageable pageRequest);
 
-    List<Moment> getMomentsByLatitudeBetweenAndLongitudeBetween(double latitude, double latitude2,
+    List<Moment> findMomentsByLatitudeBetweenAndLongitudeBetweenOrderByCreateTimeDesc(double latitude, double latitude2,
                                                                 double longitude, double longitude2, Pageable pageRequest);
 
 
-    List<Moment> getMomentsByLatitudeBetweenAndLongitudeBetween(double latitude, double latitude2,
+    List<Moment> findMomentsByLatitudeBetweenAndLongitudeBetween(double latitude, double latitude2,
                                                                 double longitude, double longitude2);
 
-    List<Moment> getMomentsByMomentIdIn(List momentIds);
+    List<Moment> findMomentsByMomentIdIn(List momentIds);
 
-    Moment getMomentByMomentId(String momentId);
+    Moment findMomentByMomentId(String momentId);
 
     int deleteMomentByMomentId(String momentId);
 
