@@ -41,7 +41,8 @@ import com.scut.weixinserver.utils.AES;
 @WebFilter(filterName = "DecryptFilter", urlPatterns = "/*")
 public class DecryptFilter implements Filter {
 	private static final Set<String> ALLOWED_PATHS = Collections
-			.unmodifiableSet(new HashSet<>(Arrays.asList("/key/keyExchange")));
+			.unmodifiableSet(new HashSet<>(Arrays.asList("/key/",
+					"/static/", "/portrait/", "/piccontent/")));
 	protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Override
@@ -60,7 +61,13 @@ public class DecryptFilter implements Filter {
 			logger.info(request.getCookies().toString());
 		// 排除不需要解密的url
 		String path = request.getRequestURI().substring(request.getContextPath().length()).replaceAll("[/]+$", "");
-		boolean allowedPath = ALLOWED_PATHS.contains(path);
+		boolean allowedPath = false;
+		int first = path.indexOf("/");
+		int second = first>=0? path.indexOf("/", first + 1):-1;
+		if(second > 0) {
+			path = path.substring(first, path.indexOf("/", first + 1) + 1);
+			allowedPath = ALLOWED_PATHS.contains(path);
+		}
 		//如果是不需要加密解密的地址，正常进入controller
 		if (allowedPath) {
 			logger.info("——————————————————解密filter结束————————————————");
