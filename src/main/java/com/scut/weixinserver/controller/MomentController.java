@@ -73,7 +73,7 @@ public class MomentController {
         if(files.size() == 0 ) {
             Result<String> result = new Result<>();
             result.setCodeAndMsg(ResultCode.IMG_NOT_ALLOW);
-            return new ResponseEntity<>(result, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(result, HttpStatus.OK);
         }else {
             List<String> fileUrls = new ArrayList<>();
             for (int i = 0; i < files.size(); i++) {
@@ -83,7 +83,7 @@ public class MomentController {
                     e.printStackTrace();
                     Result<String> result = new Result<>();
                     result.setCodeAndMsg(ResultCode.IMG_NOT_ALLOW);
-                    return new ResponseEntity<>(result, HttpStatus.INTERNAL_SERVER_ERROR);
+                    return new ResponseEntity<>(result,HttpStatus.OK);
                 }
             }
             return momentService.uploadPicContent(momentId, fileUrls);
