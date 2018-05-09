@@ -30,14 +30,14 @@ public class WebAppConfig extends WebMvcConfigurationSupport {
         //拦截/api/下的两级接口，注册除外
         registry.addInterceptor(new JwtTokenInterceptor())
                 .addPathPatterns("/**")
-                .excludePathPatterns("/user/login", "/user/register");
+                .excludePathPatterns("/user/login", "/user/register", "/piccontent/**", "/portrait/**");
     }
 
     @Override
     protected void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/static/**").addResourceLocations("classpath:/static/");
-        registry.addResourceHandler("/portrait/**").addResourceLocations("file:/home/devin/weixinshare/portrait/");
-        registry.addResourceHandler("/piccontent/**").addResourceLocations("file:/home/devin/weixinshare/piccontent/");
+        registry.addResourceHandler("/portrait/**").addResourceLocations("file:/home/dengliangqiang/weixinshare/portrait/");
+        registry.addResourceHandler("/piccontent/**").addResourceLocations("file:/home/dengliangqiang/weixinshare/piccontent/");
         super.addResourceHandlers(registry);
 
     }

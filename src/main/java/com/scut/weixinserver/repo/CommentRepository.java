@@ -18,5 +18,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     List<Comment> findCommentsByMomentId(String momentId);
 
-    List<Comment> findCommentsByMomentIdAndCreateTimeAfterOrderByCreateTimeAsc(String momentId, Date createTime);
+    List<Comment> findCommentsByRecvIdAndCreateTimeAfter(String recvId, Date createTime);
+
+    List<Comment> findCommentsByMomentIdAndCreateTimeAfter(String momentId, Date createTime);
 }

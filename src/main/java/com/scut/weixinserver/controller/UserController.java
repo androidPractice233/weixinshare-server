@@ -48,15 +48,15 @@ public class UserController {
     @PostMapping(path="/portrait")
     public @ResponseBody
     ResponseEntity setPortrait(@RequestBody MultipartFile portrait,
-                               HttpServletRequest request) {
-
+                               String userId) {
+        if(userId.charAt(0) == '\"') userId = userId.replace("\"", "");
         if(portrait.isEmpty() || "".equals(portrait.getOriginalFilename())) {
             Result<String> result = new Result<>();
             
             result.setCodeAndMsg(ResultCode.IMG_NOT_ALLOW);
             return new ResponseEntity<>(result, HttpStatus.OK);
         }else {
-            String userId = request.getAttribute("userId").toString();
+//            String userId = request.getAttribute("userId").toString();
             String portraitUrl;
             try{
                 portraitUrl = ImageUtil.saveImg(portrait, portraitLocation);
@@ -74,16 +74,16 @@ public class UserController {
     @PostMapping(path="/update")
     public @ResponseBody
     ResponseEntity update(@RequestBody User user, HttpServletRequest request) {
-        String userId = request.getAttribute("userId").toString();
-        user.setUserId(userId);
+//        String userId = request.getAttribute("userId").toString();
+//        user.setUserId(userId);
         return userService.update(user);
     }
 
     @PostMapping(path="/delete")
     public @ResponseBody
     ResponseEntity delete(@RequestBody User user, HttpServletRequest request) {
-        String userId = request.getAttribute("userId").toString();
-        user.setUserId(userId);
+//        String userId = request.getAttribute("userId").toString();
+//        user.setUserId(userId);
         return userService.delete(user);
     }
 

@@ -11,9 +11,10 @@ public class ImageUtil {
         if(!file.exists()) {
             file.mkdir();
         }
-
         FileInputStream fileInputStream = (FileInputStream) multipartFile.getInputStream();
-        String fileType = multipartFile.getContentType().substring(6);
+//        String fileType = multipartFile.getContentType().substring(6);
+        String orignFileName = multipartFile.getOriginalFilename();
+        String fileType = orignFileName.substring(orignFileName.lastIndexOf(".") + 1, orignFileName.length());
         String fileName = Uuid.getUuid() + "." + fileType;
         BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(
                 new FileOutputStream(path + File.separator + fileName));

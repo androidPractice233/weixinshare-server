@@ -55,7 +55,12 @@ public class MomentService {
         //经度1度对应距离与纬度相关
         minLongitude = longitude - (5.0/(111.0*Math.cos(latitude)));
         maxLongitude = longitude + (5.0/(111.0*Math.cos(latitude)));
-
+        //最小最大经度有可能倒置了
+        if(minLongitude > maxLongitude) {
+            double temp = minLongitude;
+            minLongitude = maxLongitude;
+            maxLongitude = temp;
+        }
         PageRequest pageRequest = new PageRequest(pageNum, pageSize,
                 new Sort(Sort.Direction.DESC, "createTime"));
 
@@ -83,7 +88,7 @@ public class MomentService {
         }
     }
 
-
+    @Transactional
     public ResponseEntity getMomentsByMomentId(List ids) {
         logger.info("MomentService.getMomentsByMomentId:args={}", ids.toString());
         Result<List<List<Object>>> result = new Result<>();
@@ -96,17 +101,24 @@ public class MomentService {
             for (Moment moment : moments) {
                 List<Object> temp = new ArrayList<>();
                 User user = userRepository.findUserByUserId(moment.getUserId());
-                temp.add(new MomentBean(moment, user.getNickName(), user.getPortrait()));
+                if(user == null) {
+                    momentRepository.deleteMomentByMomentId(moment.getMomentId());
+                    commentRepository.deleteCommentsByMomentId(moment.getMomentId());
+                    continue;
+                }
+                temp.add(MomentBean.getMomentBean(moment, user.getNickName(), user.getPortrait()));
                 List<Comment> comments = commentRepository.findCommentsByMomentId(moment.getMomentId());
                 List<CommentBean> commentBeans = new ArrayList<>();
                 for(Comment comment : comments) {
                     User sender = userRepository.findUserByUserId(comment.getSendId());
                     User recver = userRepository.findUserByUserId(comment.getRecvId());
-                    if(sender == null || recver == null) {
-                        logger.info("MomentService.getMomentsByMomentId:sender or recver not found.commentId:{}, sendId:{}, recvId:{}", comment.getCommentId(),
+                    if(sender == null) {
+                        logger.info("MomentService.getMomentsByMomentId:sender not found.commentId:{}, sendId:{}, recvId:{}", comment.getCommentId(),
                                 comment.getSendId(), comment.getRecvId());
-                    } else {
-                        commentBeans.add(new CommentBean(comment, sender.getNickName(), sender.getPortrait(), recver.getNickName()));
+                    }else if(recver == null) {
+                        commentBeans.add(CommentBean.getCommentBean(comment, sender.getNickName(), sender.getPortrait(), null));
+                    }else {
+                        commentBeans.add(CommentBean.getCommentBean(comment, sender.getNickName(), sender.getPortrait(), recver.getNickName()));
                     }
                 }
                 if (commentBeans.size() > 0) {
@@ -138,7 +150,7 @@ public class MomentService {
             //查询结果，每个子list第一条为moment， 后面为comment
             List<Object> temp = new ArrayList<>();
             User user = userRepository.findUserByUserId(moment.getUserId());
-            temp.add(new MomentBean(moment, user.getNickName(), user.getPortrait()));
+            temp.add(MomentBean.getMomentBean(moment, user.getNickName(), user.getPortrait()));
             List<Comment> comments = commentRepository.findCommentsByMomentId(moment.getMomentId());
             List<CommentBean> commentBeans = new ArrayList<>();
             for(Comment comment : comments) {
@@ -148,7 +160,7 @@ public class MomentService {
                     logger.info("MomentService.getMomentsByUserId:sender or recver not found.commentId:{}, sendId:{}, recvId:{}", comment.getCommentId(),
                             comment.getSendId(), comment.getRecvId());
                 } else {
-                    commentBeans.add(new CommentBean(comment, sender.getNickName(), sender.getPortrait(), recver.getNickName()));
+                    commentBeans.add(CommentBean.getCommentBean(comment, sender.getNickName(), sender.getPortrait(), recver.getNickName()));
                 }
             }
             if (commentBeans.size() > 0) {
@@ -198,6 +210,7 @@ public class MomentService {
             String url = Strings.join(fileUrls, ',');
             momentFromDb.setPicContent(url);
             momentRepository.save(momentFromDb);
+            logger.info("MomentService.uploadPicContent: save success, url={}", url);
             Map<String, String> temp = new HashMap<>();
             temp.put("picContent", url);
             result.setData(temp);
@@ -230,7 +243,7 @@ public class MomentService {
         if(comment.getMomentId() == null || comment.getMomentId().equals("")){
             logger.error("MomentService.createComment: insert error={}", comment.toString());
             result.setCodeAndMsg(ResultCode.SERVER_ERROR);
-            return new ResponseEntity<>(result, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(result, HttpStatus.OK);
         }
         Moment moment = momentRepository.findMomentByMomentId(comment.getMomentId());
         moment.setUpdateTime(comment.getCreateTime());
@@ -273,14 +286,32 @@ public class MomentService {
         PageRequest pageRequest = new PageRequest(pageNum, pageSize,
                 new Sort(Sort.Direction.DESC, "createTime"));
         List<Moment> moments = momentRepository.findMomentsByUserIdOrderByCreateTimeDesc(userId, pageRequest);
+        Set<String> momentIdSet = new HashSet<>();
         for (Moment moment : moments) {
-            List<Comment> comments = commentRepository.findCommentsByMomentIdAndCreateTimeAfterOrderByCreateTimeAsc(
+            momentIdSet.add(moment.getMomentId());
+            List<Comment> comments = commentRepository.findCommentsByMomentIdAndCreateTimeAfter(
                     moment.getMomentId(), new Date(sinceTime));
             if (comments.size() > 0) {
                 resultComments.addAll(comments);
             }
         }
+        //在其他人动态下的评论更新
+        List<Comment> commentsFromOtherMoment = commentRepository.findCommentsByRecvIdAndCreateTimeAfter(userId, new Date(sinceTime));
+        for(Comment comment:commentsFromOtherMoment) {
+            //不包含在已拿到comment里
+            if(!momentIdSet.contains(comment.getMomentId())) {
+                resultComments.add(comment);
+            }
+        }
+
+
         if(resultComments.size() > 0) {
+            resultComments.sort(new Comparator<Comment>() {
+                @Override
+                public int compare(Comment comment, Comment t1) {
+                    return t1.getCreateTime().compareTo(comment.getCreateTime());
+                }
+            });
             result.setData(resultComments);
             result.setCodeAndMsg(ResultCode.SUCCESS);
             return new ResponseEntity<>(result, HttpStatus.OK);
