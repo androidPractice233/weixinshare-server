@@ -48,7 +48,7 @@ public class JwtTokenInterceptor implements HandlerInterceptor {
             if (authHeader == null || authHeader.trim().equals("")) {
                 throw new SignatureException("not found Auth-Token");
             }
-
+            
             final Claims claims = Jwts.parser().setSigningKey("winxinshare1.0").parseClaimsJws(authHeader).getBody();
             request.setAttribute("userId", claims.getSubject());
             Token tokenFromDb = getDAO(TokenRepository.class, request).findTokenByUserId(

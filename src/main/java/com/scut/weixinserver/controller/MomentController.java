@@ -7,6 +7,10 @@ import com.scut.weixinserver.model.Result;
 import com.scut.weixinserver.model.ResultCode;
 import com.scut.weixinserver.service.MomentService;
 import com.scut.weixinserver.utils.ImageUtil;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,7 +68,11 @@ public class MomentController {
     @PostMapping(path="/create")
     public @ResponseBody
     ResponseEntity createMoment(@RequestBody Moment moment, HttpServletRequest request) {
-//        moment.setUserId(request.getAttribute("userId").toString());
+       logger.info("inteceptor后request中是否存有userid:"+request.getAttribute("userId"));
+    	 String authHeader = request.getHeader("Auth-Token");
+    	 final Claims claims = Jwts.parser().setSigningKey("winxinshare1.0").parseClaimsJws(authHeader).getBody();
+    	 String userId=claims.getSubject();
+    	 moment.setUserId(userId);   	
         return momentService.createMoment(moment);
     }
 
