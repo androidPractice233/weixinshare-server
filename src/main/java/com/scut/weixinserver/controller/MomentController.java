@@ -70,9 +70,8 @@ public class MomentController {
 
     @PostMapping(path="/piccontent")
     public @ResponseBody
-    ResponseEntity uploadPicContent(HttpServletRequest request) {
-        List<MultipartFile> files = ((MultipartHttpServletRequest)request).getFiles("piccontent");
-        String momentId = request.getHeader("momentId");
+    ResponseEntity uploadPicContent(HttpServletRequest request, String momentId ) {
+        List<MultipartFile> files = ((MultipartHttpServletRequest)request).getFiles("picContent");
         if(files.size() == 0 ) {
             Result<String> result = new Result<>();
             result.setCodeAndMsg(ResultCode.IMG_NOT_ALLOW);
