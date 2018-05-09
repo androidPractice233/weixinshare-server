@@ -7,6 +7,8 @@ import com.scut.weixinserver.model.Result;
 import com.scut.weixinserver.model.ResultCode;
 import com.scut.weixinserver.service.MomentService;
 import com.scut.weixinserver.utils.ImageUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -29,6 +31,7 @@ import java.util.List;
 @Controller
 @RequestMapping(path="/moment")
 public class MomentController {
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Value("${img.picContentLocation}")
     private String picContentLocation;
@@ -61,7 +64,7 @@ public class MomentController {
     @PostMapping(path="/create")
     public @ResponseBody
     ResponseEntity createMoment(@RequestBody Moment moment, HttpServletRequest request) {
-        moment.setUserId(request.getAttribute("userId").toString());
+//        moment.setUserId(request.getAttribute("userId").toString());
         return momentService.createMoment(moment);
     }
 

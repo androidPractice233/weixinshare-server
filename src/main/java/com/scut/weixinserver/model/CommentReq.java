@@ -7,6 +7,8 @@ public class CommentReq {
 
     private int pageSize;
 
+    private String userId;
+
 
     public CommentReq() {
     }
@@ -17,6 +19,7 @@ public class CommentReq {
                 "dateTime=" + dateTime +
                 ", pageNum=" + pageNum +
                 ", pageSize=" + pageSize +
+                ", userId='" + userId + '\'' +
                 '}';
     }
 
@@ -44,9 +47,18 @@ public class CommentReq {
         this.pageSize = pageSize;
     }
 
-    public CommentReq(long dateTime, int pageNum, int pageSize) {
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public CommentReq(long dateTime, int pageNum, int pageSize, String userId) {
         this.dateTime = dateTime;
         this.pageNum = pageNum;
         this.pageSize = pageSize;
+        this.userId = userId;
     }
 }
