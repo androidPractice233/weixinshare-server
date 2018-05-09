@@ -34,13 +34,13 @@ public class JwtTokenInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object o) throws Exception {
         //排除生成token的请求，且如果是options请求是core跨域预请求，设置allow对应头信息
 
-//    	String path = request.getRequestURI().substring(request.getContextPath().length()).replaceAll("[/]+$", "");
-//        if("/user/register".contentEquals(path)
-//                ||"/user/login".contentEquals(path)
-//                ||"/key/keyExchange".contentEquals(path)
-//                || RequestMethod.OPTIONS.toString().equals(request.getMethod())) {
-//            return true;
-//        }
+    	String path = request.getRequestURI().substring(request.getContextPath().length()).replaceAll("[/]+$", "");
+        if("/user/register".contentEquals(path)
+                ||"/user/login".contentEquals(path)
+                ||"/key/keyExchange".contentEquals(path)
+                || RequestMethod.OPTIONS.toString().equals(request.getMethod())) {
+            return true;
+        }
 
         
         final String authHeader = request.getHeader("Auth-Token");
