@@ -23,7 +23,8 @@ public class CommentController {
 
     @PostMapping(path="/create")
     public @ResponseBody
-    ResponseEntity createComment(@RequestBody Comment comment) {
+    ResponseEntity createComment(@RequestBody Comment comment, HttpServletRequest request) {
+        comment.setSendId(request.getAttribute("userId").toString());
         return momentService.createComment(comment);
     }
 
