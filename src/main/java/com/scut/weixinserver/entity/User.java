@@ -1,17 +1,23 @@
 package com.scut.weixinserver.entity;
 
-import org.hibernate.validator.constraints.UniqueElements;
+
+
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
+
 import java.util.Date;
 
 @Entity
+@Table(name="user",
+uniqueConstraints = {@UniqueConstraint(columnNames="userName")})
 public class User {
     @Id
     private String userId;
-    @UniqueElements
+
     private String userName;
     private String nickName;
     private String userPwd;
