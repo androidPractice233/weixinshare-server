@@ -55,7 +55,12 @@ public class MomentService {
         //经度1度对应距离与纬度相关
         minLongitude = longitude - (5.0/(111.0*Math.cos(latitude)));
         maxLongitude = longitude + (5.0/(111.0*Math.cos(latitude)));
-
+        //最小最大经度有可能倒置了
+        if(minLongitude > maxLongitude) {
+            double temp = minLongitude;
+            minLongitude = maxLongitude;
+            maxLongitude = temp;
+        }
         PageRequest pageRequest = new PageRequest(pageNum, pageSize,
                 new Sort(Sort.Direction.DESC, "createTime"));
 
