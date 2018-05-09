@@ -71,13 +71,15 @@ public class UserService {
                 userFromDb.setLastLoginTime(new Date());
                 userRepository.save(userFromDb);
 
-                Token tokenFromDb = tokenRepository.findTokenByUserId(user.getUserId());
+                Token tokenFromDb = tokenRepository.findTokenByUserId(userFromDb.getUserId());
+                logger.info("TOKEN FROM DB USER ID:", userFromDb.getUserId());
                 String tokenStr;
                 if(tokenFromDb == null) {
-                    tokenStr = createNewToken(user.getUserId());
+                    tokenStr = createNewToken(userFromDb.getUserId());
                     tokenFromDb = new Token();
                     tokenFromDb.setTokenId(Uuid.getUuid());
-                    tokenFromDb.setUserId(user.getUserId());
+                    logger.info("UserService.login: userPassErr={}", user.toString());
+                    tokenFromDb.setUserId(userFromDb.getUserId());
                     tokenFromDb.setBuildTime(String.valueOf(System.currentTimeMillis()));
                     tokenFromDb.setToken(tokenStr);
                     logger.info("UserService.login: gen new Token, user={}, token={}", user.toString(), tokenStr);

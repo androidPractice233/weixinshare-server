@@ -42,7 +42,7 @@ public class JwtTokenInterceptor implements HandlerInterceptor {
             return true;
         }
 
-        
+        logger.info("开始处理请求："+path);
         final String authHeader = request.getHeader("Auth-Token");
         try {
             if (authHeader == null || authHeader.trim().equals("")) {
