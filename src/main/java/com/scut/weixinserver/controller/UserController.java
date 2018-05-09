@@ -49,7 +49,7 @@ public class UserController {
     public @ResponseBody
     ResponseEntity setPortrait(@RequestBody MultipartFile portrait,
                                String userId) {
-
+        if(userId.charAt(0) == '\"') userId.replace("\"", "");
         if(portrait.isEmpty() || "".equals(portrait.getOriginalFilename())) {
             Result<String> result = new Result<>();
             
