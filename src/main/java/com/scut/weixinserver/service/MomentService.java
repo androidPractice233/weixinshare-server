@@ -230,7 +230,7 @@ public class MomentService {
         if(comment.getMomentId() == null || comment.getMomentId().equals("")){
             logger.error("MomentService.createComment: insert error={}", comment.toString());
             result.setCodeAndMsg(ResultCode.SERVER_ERROR);
-            return new ResponseEntity<>(result, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(result, HttpStatus.OK);
         }
         Moment moment = momentRepository.findMomentByMomentId(comment.getMomentId());
         moment.setUpdateTime(comment.getCreateTime());
