@@ -112,10 +112,12 @@ public class MomentService {
                 for(Comment comment : comments) {
                     User sender = userRepository.findUserByUserId(comment.getSendId());
                     User recver = userRepository.findUserByUserId(comment.getRecvId());
-                    if(sender == null || recver == null) {
-                        logger.info("MomentService.getMomentsByMomentId:sender or recver not found.commentId:{}, sendId:{}, recvId:{}", comment.getCommentId(),
+                    if(sender == null) {
+                        logger.info("MomentService.getMomentsByMomentId:sender not found.commentId:{}, sendId:{}, recvId:{}", comment.getCommentId(),
                                 comment.getSendId(), comment.getRecvId());
-                    } else {
+                    }else if(recver == null) {
+                        commentBeans.add(CommentBean.getCommentBean(comment, sender.getNickName(), sender.getPortrait(), null));
+                    }else {
                         commentBeans.add(CommentBean.getCommentBean(comment, sender.getNickName(), sender.getPortrait(), recver.getNickName()));
                     }
                 }
