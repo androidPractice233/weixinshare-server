@@ -80,6 +80,7 @@ public class DecryptFilter implements Filter {
 		//如果存在SESSION中存在AES key，流程正常进行
 		if (requestWrapper.tryDecrypt(requestWrapper)) {
 			filterChain.doFilter(requestWrapper, wrapResponse);
+			//如果不是200，程序错误，不需加密
 			if(wrapResponse.getStatus()!=200){
 				response.setStatus(wrapResponse.getStatus());
 				writeResponse(response,new String(wrapResponse.getResponseData(), "utf-8"));
