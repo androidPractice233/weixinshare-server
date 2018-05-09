@@ -279,14 +279,32 @@ public class MomentService {
         PageRequest pageRequest = new PageRequest(pageNum, pageSize,
                 new Sort(Sort.Direction.DESC, "createTime"));
         List<Moment> moments = momentRepository.findMomentsByUserIdOrderByCreateTimeDesc(userId, pageRequest);
+        Set<String> momentIdSet = new HashSet<>();
         for (Moment moment : moments) {
-            List<Comment> comments = commentRepository.findCommentsByMomentIdAndCreateTimeAfterOrderByCreateTimeAsc(
+            momentIdSet.add(moment.getMomentId());
+            List<Comment> comments = commentRepository.findCommentsByMomentIdAndCreateTimeAfter(
                     moment.getMomentId(), new Date(sinceTime));
             if (comments.size() > 0) {
                 resultComments.addAll(comments);
             }
         }
+        //在其他人动态下的评论更新
+        List<Comment> commentsFromOtherMoment = commentRepository.findCommentsByRecvIdAndCreateTimeAfter(userId, new Date(sinceTime));
+        for(Comment comment:commentsFromOtherMoment) {
+            //不包含在已拿到comment里
+            if(!momentIdSet.contains(comment.getMomentId())) {
+                resultComments.add(comment);
+            }
+        }
+
+
         if(resultComments.size() > 0) {
+            resultComments.sort(new Comparator<Comment>() {
+                @Override
+                public int compare(Comment comment, Comment t1) {
+                    return t1.getCreateTime().compareTo(comment.getCreateTime());
+                }
+            });
             result.setData(resultComments);
             result.setCodeAndMsg(ResultCode.SUCCESS);
             return new ResponseEntity<>(result, HttpStatus.OK);
