@@ -23,8 +23,8 @@ public class MomentBean {
     public MomentBean() {
     }
 
-    public MomentBean(Moment moment, String nickName, String portrait) {
-        new MomentBean(moment.getMomentId(), moment.getUserId(), moment.getTextContent(), moment.getPicContent(), moment.getCreateTime(), moment.getLongitude(), moment.getLatitude(), moment.getLocation(), moment.getUpdateTime(), nickName, portrait);
+    public static MomentBean getMomentBean(Moment moment, String nickName, String portrait) {
+        return new MomentBean(moment.getMomentId(), moment.getUserId(), moment.getTextContent(), moment.getPicContent(), moment.getCreateTime(), moment.getLongitude(), moment.getLatitude(), moment.getLocation(), moment.getUpdateTime(), nickName, portrait);
     }
 
 

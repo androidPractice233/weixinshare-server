@@ -20,8 +20,8 @@ public class CommentBean {
     public CommentBean() {
     }
 
-    public CommentBean(Comment comment, String sendNickName, String sendPortrait, String recvNickName) {
-        new CommentBean(comment.getCommentId(), comment.getMomentId(), comment.getSendId(), comment.getRecvId(), comment.getContent(), comment.getCreateTime(), sendNickName, sendPortrait, recvNickName);
+    public static CommentBean getCommentBean(Comment comment, String sendNickName, String sendPortrait, String recvNickName) {
+        return new CommentBean(comment.getCommentId(), comment.getMomentId(), comment.getSendId(), comment.getRecvId(), comment.getContent(), comment.getCreateTime(), sendNickName, sendPortrait, recvNickName);
     }
     public CommentBean(String commentId, String momentId, String sendId, String recvId, String content, Date createTime, String sendNickName, String sendPortrait, String recvNickName) {
         this.commentId = commentId;

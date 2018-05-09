@@ -102,10 +102,11 @@ public class MomentService {
                 List<Object> temp = new ArrayList<>();
                 User user = userRepository.findUserByUserId(moment.getUserId());
                 if(user == null) {
+                    momentRepository.deleteMomentByMomentId(moment.getMomentId());
                     commentRepository.deleteCommentsByMomentId(moment.getMomentId());
                     continue;
                 }
-                temp.add(new MomentBean(moment, user.getNickName(), user.getPortrait()));
+                temp.add(MomentBean.getMomentBean(moment, user.getNickName(), user.getPortrait()));
                 List<Comment> comments = commentRepository.findCommentsByMomentId(moment.getMomentId());
                 List<CommentBean> commentBeans = new ArrayList<>();
                 for(Comment comment : comments) {
@@ -115,7 +116,7 @@ public class MomentService {
                         logger.info("MomentService.getMomentsByMomentId:sender or recver not found.commentId:{}, sendId:{}, recvId:{}", comment.getCommentId(),
                                 comment.getSendId(), comment.getRecvId());
                     } else {
-                        commentBeans.add(new CommentBean(comment, sender.getNickName(), sender.getPortrait(), recver.getNickName()));
+                        commentBeans.add(CommentBean.getCommentBean(comment, sender.getNickName(), sender.getPortrait(), recver.getNickName()));
                     }
                 }
                 if (commentBeans.size() > 0) {
@@ -147,7 +148,7 @@ public class MomentService {
             //查询结果，每个子list第一条为moment， 后面为comment
             List<Object> temp = new ArrayList<>();
             User user = userRepository.findUserByUserId(moment.getUserId());
-            temp.add(new MomentBean(moment, user.getNickName(), user.getPortrait()));
+            temp.add(MomentBean.getMomentBean(moment, user.getNickName(), user.getPortrait()));
             List<Comment> comments = commentRepository.findCommentsByMomentId(moment.getMomentId());
             List<CommentBean> commentBeans = new ArrayList<>();
             for(Comment comment : comments) {
@@ -157,7 +158,7 @@ public class MomentService {
                     logger.info("MomentService.getMomentsByUserId:sender or recver not found.commentId:{}, sendId:{}, recvId:{}", comment.getCommentId(),
                             comment.getSendId(), comment.getRecvId());
                 } else {
-                    commentBeans.add(new CommentBean(comment, sender.getNickName(), sender.getPortrait(), recver.getNickName()));
+                    commentBeans.add(CommentBean.getCommentBean(comment, sender.getNickName(), sender.getPortrait(), recver.getNickName()));
                 }
             }
             if (commentBeans.size() > 0) {
