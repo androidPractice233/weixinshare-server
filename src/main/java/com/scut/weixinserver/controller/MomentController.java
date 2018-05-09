@@ -71,7 +71,7 @@ public class MomentController {
     @PostMapping(path="/piccontent")
     public @ResponseBody
     ResponseEntity uploadPicContent(HttpServletRequest request, String momentId ) {
-        if(momentId.charAt(0) == '\"') momentId.replace("\"", "");
+        if(momentId.charAt(0) == '\"') momentId = momentId.replace("\"", "");
         List<MultipartFile> files = ((MultipartHttpServletRequest)request).getFiles("picContent");
         if(files.size() == 0 ) {
             Result<String> result = new Result<>();
