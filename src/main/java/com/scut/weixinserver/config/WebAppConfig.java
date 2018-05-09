@@ -36,8 +36,8 @@ public class WebAppConfig extends WebMvcConfigurationSupport {
     @Override
     protected void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/static/**").addResourceLocations("classpath:/static/");
-        registry.addResourceHandler("/portrait/**").addResourceLocations("file:/home/devin/weixinshare/portrait/");
-        registry.addResourceHandler("/piccontent/**").addResourceLocations("file:/home/devin/weixinshare/piccontent/");
+        registry.addResourceHandler("/portrait/**").addResourceLocations("file:/home/dengliangqiang/weixinshare/portrait/");
+        registry.addResourceHandler("/piccontent/**").addResourceLocations("file:/home/dengliangqiang/weixinshare/piccontent/");
         super.addResourceHandlers(registry);
 
     }
