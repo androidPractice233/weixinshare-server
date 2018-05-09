@@ -88,7 +88,7 @@ public class MomentService {
         }
     }
 
-
+    @Transactional
     public ResponseEntity getMomentsByMomentId(List ids) {
         logger.info("MomentService.getMomentsByMomentId:args={}", ids.toString());
         Result<List<List<Object>>> result = new Result<>();
