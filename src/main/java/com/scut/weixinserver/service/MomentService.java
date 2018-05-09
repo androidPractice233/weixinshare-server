@@ -101,6 +101,10 @@ public class MomentService {
             for (Moment moment : moments) {
                 List<Object> temp = new ArrayList<>();
                 User user = userRepository.findUserByUserId(moment.getUserId());
+                if(user == null) {
+                    commentRepository.deleteCommentsByMomentId(moment.getMomentId());
+                    continue;
+                }
                 temp.add(new MomentBean(moment, user.getNickName(), user.getPortrait()));
                 List<Comment> comments = commentRepository.findCommentsByMomentId(moment.getMomentId());
                 List<CommentBean> commentBeans = new ArrayList<>();
