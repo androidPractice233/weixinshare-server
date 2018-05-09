@@ -49,14 +49,14 @@ public class UserService {
     public ResponseEntity login(User user) {
         logger.info("UserService.login: args={}", user.toString());
         Result<Map> result = new Result<>();
-        if(user.getUserId() == null || "".equals(user.getUserId())) {
+        if(user.getUserName()== null || "".equals(user.getUserName())) {
             result.setCodeAndMsg(ResultCode.INVALID_PARAMS);
             return new ResponseEntity<>(result, HttpStatus.OK);
         } else if(user.getUserPwd() == null || "".equals(user.getUserPwd())) {
             result.setCodeAndMsg(ResultCode.USER_PASS_ERR);
             return new ResponseEntity<>(result, HttpStatus.OK);
         } else {
-            User userFromDb = userRepository.findUserByUserId(user.getUserId());
+            User userFromDb = userRepository.findUserByUserName(user.getUserName());
             user.setUserPwd(MD5.MD5Encode(user.getUserPwd(), "UTF-8"));
             if(userFromDb == null) {
                 logger.info("UserService.login: userNotFound={}", user.toString());
