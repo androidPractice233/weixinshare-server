@@ -269,6 +269,7 @@ public class UserService {
             return new ResponseEntity<>(result, HttpStatus.OK);
         }
         List<User> userList = userRepository.findUsersByUserIdIn(userIds);
+        logger.info("UserService.getNickPot: resultFromUserRepository={}", userList.toString());
         if(userList == null || userList.isEmpty()) {
             logger.info("UserService.getNickPot: userNotFound={}", userIds.toString());
             result.setCodeAndMsg(ResultCode.USER_NOT_EXIST);
