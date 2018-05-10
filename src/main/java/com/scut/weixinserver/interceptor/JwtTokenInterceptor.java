@@ -38,6 +38,7 @@ public class JwtTokenInterceptor implements HandlerInterceptor {
         if("/user/register".contentEquals(path)
                 ||"/user/login".contentEquals(path)
                 ||"/key/keyExchange".contentEquals(path)
+                ||"/user/portrait".contentEquals(path)
                 || RequestMethod.OPTIONS.toString().equals(request.getMethod())) {
             return true;
         }
