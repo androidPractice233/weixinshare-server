@@ -96,6 +96,8 @@ public class UserController {
     @PostMapping(path="/getnickpot")
     public @ResponseBody
     ResponseEntity getnickpot(@RequestBody String userIds) {
+        //参数可能带引号
+        userIds = userIds.replace('\"', '\0');
         List<String> idList = Arrays.asList(userIds.split(","));
         return userService.getNickPot(idList);
     }
