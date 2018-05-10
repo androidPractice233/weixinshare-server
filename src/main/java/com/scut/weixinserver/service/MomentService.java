@@ -139,38 +139,46 @@ public class MomentService {
     }
 
     public ResponseEntity getMomentsByUserId(String userId, int pageNum, int pageSize) {
-        logger.info("MomentService.getMomentsByUserId: userId = {}, pageNum = {}, pageSize = {}", userId, pageNum, pageSize);
-        Result<List<List<Object>>> result = new Result<>();
-
+        logger.info("MomentService.getMomentsByUserId: userId = {}, pageNum = {}, pageSize = {}", userId, pageNum, pageSize);    
         PageRequest pageRequest = new PageRequest(pageNum, pageSize,
                 new Sort(Sort.Direction.DESC, "createTime"));
         List<Moment> moments = momentRepository.findMomentsByUserIdOrderByCreateTimeDesc(userId, pageRequest);
-        List<List<Object>> resultMoments = new ArrayList<>();
-        for (Moment moment : moments) {
-            //查询结果，每个子list第一条为moment， 后面为comment
-            List<Object> temp = new ArrayList<>();
-            User user = userRepository.findUserByUserId(moment.getUserId());
-            temp.add(MomentBean.getMomentBean(moment, user.getNickName(), user.getPortrait()));
-            List<Comment> comments = commentRepository.findCommentsByMomentId(moment.getMomentId());
-            List<CommentBean> commentBeans = new ArrayList<>();
-            for(Comment comment : comments) {
-                User sender = userRepository.findUserByUserId(comment.getSendId());
-                User recver = userRepository.findUserByUserId(comment.getRecvId());
-                if(sender == null || recver == null) {
-                    logger.info("MomentService.getMomentsByUserId:sender or recver not found.commentId:{}, sendId:{}, recvId:{}", comment.getCommentId(),
-                            comment.getSendId(), comment.getRecvId());
-                } else {
-                    commentBeans.add(CommentBean.getCommentBean(comment, sender.getNickName(), sender.getPortrait(), recver.getNickName()));
+        List<Map> resultList = new ArrayList<>();
+        Result<List<Map>> result = new Result<>();
+//        List<List<Object>> resultMoments = new ArrayList<>();
+//        for (Moment moment : moments) {
+//            //查询结果，每个子list第一条为moment， 后面为comment
+//            List<Object> temp = new ArrayList<>();
+//            User user = userRepository.findUserByUserId(moment.getUserId());
+//            
+//            temp.add(MomentBean.getMomentBean(moment, user.getNickName(), user.getPortrait()));
+//            List<Comment> comments = commentRepository.findCommentsByMomentId(moment.getMomentId());
+//            List<CommentBean> commentBeans = new ArrayList<>();
+//            for(Comment comment : comments) {
+//                User sender = userRepository.findUserByUserId(comment.getSendId());
+//                User recver = userRepository.findUserByUserId(comment.getRecvId());
+//                if(sender == null || recver == null) {
+//                    logger.info("MomentService.getMomentsByUserId:sender or recver not found.commentId:{}, sendId:{}, recvId:{}", comment.getCommentId(),
+//                            comment.getSendId(), comment.getRecvId());
+//                } else {
+//                    commentBeans.add(CommentBean.getCommentBean(comment, sender.getNickName(), sender.getPortrait(), recver.getNickName()));
+//                }
+//            }
+//            if (commentBeans.size() > 0) {
+//                temp.addAll(commentBeans);
+//            }
+//            resultMoments.add(temp);
+            
+            for (Moment moment : moments) {
+                Map<String, Object> tempMap = new HashMap<>();  
+                    tempMap.put("momentId", moment.getMomentId());
+                    tempMap.put("updateTime", moment.getUpdateTime());
+                    resultList.add(tempMap);
                 }
-            }
-            if (commentBeans.size() > 0) {
-                temp.addAll(commentBeans);
-            }
-            resultMoments.add(temp);
-        }
-        logger.info("MomentService.getMomentsByUserId: return size = {}", resultMoments.size());
-        if(resultMoments.size() > 0) {
-            result.setData(resultMoments);
+        
+        logger.info("MomentService.getMomentsByUserId: return size = {}", resultList.size());
+        if(resultList.size() > 0) {
+            result.setData(resultList);
             result.setCodeAndMsg(ResultCode.SUCCESS);
             return new ResponseEntity<>(result, HttpStatus.OK);
         }else {
@@ -178,7 +186,6 @@ public class MomentService {
             return new ResponseEntity<>(result, HttpStatus.OK);
         }
     }
-
     public ResponseEntity createMoment(Moment moment) {
         logger.info("MomentService.createMoment: args={}", moment.toString());
         Result<Map> result = new Result<>();

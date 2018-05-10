@@ -28,7 +28,8 @@ public class CommentController {
     @PostMapping(path="/create")
     public @ResponseBody
     ResponseEntity createComment(@RequestBody Comment comment, HttpServletRequest request) {
-//        comment.setSendId(request.getAttribute("userId").toString());
+    	logger.info("inteceptor后request中是否存有userid:"+request.getAttribute("userId"));
+       comment.setSendId(request.getAttribute("userId").toString());
         return momentService.createComment(comment);
     }
 
