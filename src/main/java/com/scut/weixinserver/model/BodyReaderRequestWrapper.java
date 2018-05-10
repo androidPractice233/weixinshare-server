@@ -56,7 +56,7 @@ public class BodyReaderRequestWrapper extends HttpServletRequestWrapper {
          else{
         	 logger.info("解密前:"+body);
         	 body=AES.decrypt(body, AESkey);
-        	 logger.info("解密后：",body);
+        	 logger.info("解密后："+body);
              return true;
          }
      }
