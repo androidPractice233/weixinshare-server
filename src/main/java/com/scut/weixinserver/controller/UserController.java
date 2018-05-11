@@ -4,6 +4,7 @@ package com.scut.weixinserver.controller;
 import com.scut.weixinserver.entity.User;
 import com.scut.weixinserver.model.Result;
 import com.scut.weixinserver.model.ResultCode;
+import com.scut.weixinserver.model.UserReq;
 import com.scut.weixinserver.service.UserService;
 import com.scut.weixinserver.utils.ImageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,10 +96,11 @@ public class UserController {
 
     @PostMapping(path="/getnickpot")
     public @ResponseBody
-    ResponseEntity getnickpot(@RequestBody String userIds) {
+    ResponseEntity getnickpot(@RequestBody UserReq userReq) {
         //参数可能带引号
-        userIds = userIds.replace('\"', '\0');
-        List<String> idList = Arrays.asList(userIds.split(","));
+//        userIds = userIds.replace('\"', '\0');
+//        List<String> idList = Arrays.asList(userIds.split(","));
+        List<String> idList = Arrays.asList(userReq.getUserIds().split(","));
         return userService.getNickPot(idList);
     }
 

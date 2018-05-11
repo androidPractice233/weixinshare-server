@@ -260,7 +260,7 @@ public class UserService {
         }
     }
 
-    public ResponseEntity getNickPot(List<String> userIds) {
+    public ResponseEntity getNickPot(List userIds) {
         logger.info("UserService.getNickPot: userIds={}", userIds.toString());
         Result<List<Map>> result = new Result<>();
         if(userIds.isEmpty()) {
