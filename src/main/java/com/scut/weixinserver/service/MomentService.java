@@ -216,6 +216,7 @@ public class MomentService {
         }else {
             String url = Strings.join(fileUrls, ',');
             momentFromDb.setPicContent(url);
+            momentFromDb.setUpdateTime(new Date());
             momentRepository.save(momentFromDb);
             logger.info("MomentService.uploadPicContent: save success, url={}", url);
             Map<String, String> temp = new HashMap<>();
